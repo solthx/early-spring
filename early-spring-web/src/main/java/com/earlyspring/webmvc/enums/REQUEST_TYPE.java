@@ -8,12 +8,18 @@ package com.earlyspring.webmvc.enums;
  */
 public enum REQUEST_TYPE {
 
-    GET(0),
-    POST(1);
+    GET(1),
+    POST(2),
+    PUT(4),
+    DELETE(8);
 
     private Integer type;
 
     private REQUEST_TYPE(Integer type) {
         this.type = type;
+    }
+
+    public Integer getType() {
+        return type;
     }
 }

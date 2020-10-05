@@ -17,5 +17,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequestEntrance {
     String pattern();
-    REQUEST_TYPE type();
+    REQUEST_TYPE type() default REQUEST_TYPE.GET;
 }
