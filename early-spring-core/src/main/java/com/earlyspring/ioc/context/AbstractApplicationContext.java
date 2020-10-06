@@ -1,5 +1,6 @@
 package com.earlyspring.ioc.context;
 
+import com.earlyspring.ioc.callback.aware.Aware;
 import lombok.extern.slf4j.Slf4j;
 import com.earlyspring.ioc.bean.BeanDefinition;
 import com.earlyspring.ioc.callback.processor.BeanDefinitionRegistryPostProcessor;
@@ -8,7 +9,9 @@ import com.earlyspring.ioc.callback.processor.BeanPostProcessor;
 import com.earlyspring.ioc.callback.processor.InstantiationAwareBeanPostProcessor;
 import com.earlyspring.ioc.container.BeanContainer;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -46,7 +49,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     }
 
     private ConcurrentHashMap<Class<?>, List<String>> getGetBeanNameByType() {
-        return beanContainer.getGetBeanNameByType();
+        return beanContainer.getBeanTypeMap();
     }
 
     /**
@@ -61,8 +64,9 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
             // 调用实现BeanDefinitionRegistryPostProcessor和BeanFactoryPostProcessor
             // 先BeanDefinitionRegistryPostProcessor, 后BeanFactoryPostProcessor
             invokeBeanFactoryPostProcessors(); //todo: 权重排序
-            // 注册beanPostProcessor
-            registerBeanPostProcessors(); // todo: 权重排序
+            // 注册Processor（Bean级别Processor，AwareProcessor）
+            registerProcessors(); // todo: 权重排序
+
             // 刷新容器, 创建已经注册了但未被创建的，单例，且是非懒加载的Bean
             refreshBeanContainer();
         }
@@ -87,15 +91,24 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     /**
      * 添加BeanPostProcessor后置处理器
      */
-    private void registerBeanPostProcessors() {
+    private void registerProcessors() {
         for (String beanName : getBeanNameList()) {
             BeanDefinition bd = getBeanDefinition(beanName);
             if (bd == null) continue;
             Class<?> beanClazz = bd.getClazz();
-            if (beanClazz != null && ( BeanPostProcessor.class.isAssignableFrom(beanClazz)) ) {
-                getBeanPostProcessors().add((BeanPostProcessor) getBean(beanName));
+            // 注册BeanPost的processor
+            if (beanClazz != null ) {
+                if (( BeanPostProcessor.class.isAssignableFrom(beanClazz))){
+                    getBeanPostProcessors().add((BeanPostProcessor) getBean(beanName));
+                }else if (Aware.class.isAssignableFrom(beanClazz)){
+                    getAwareProcessors().add( (Aware)getBean(beanName));
+                }
             }
         }
+    }
+
+    private List<Aware> getAwareProcessors() {
+        return beanContainer.getAwareProcessors();
     }
 
     private List<BeanPostProcessor> getBeanPostProcessors() {
@@ -240,6 +253,34 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         registerSingleton(beanName, createdBean);
         return createdBean;
     }
+
+    /**
+     * 获取所有标记了特定annotation的bean
+     *
+     * @param annotationClass
+     * @return
+     */
+    @Override
+    public Map<String, Object> getBeansWithAnnotations(Class<? extends Annotation> annotationClass) {
+        Map<String, Object> beanMap = beanContainer.getBeanByFilter((a) -> {
+            // 返回bean的类对象是否标注了annotationClass注解
+            return (a.getClass().isAnnotationPresent(annotationClass));
+        });
+        return beanMap;
+    }
+
+
+    /**
+     * 获取所有标记了特定annotation的bean
+     *
+     * @param targetClass
+     * @return
+     */
+    @Override
+    public Map<String, Object> getBeansByType(Class<?> targetClass) {
+        return beanContainer.getBeansByType(targetClass);
+    }
+
 
     /**
      * 注册Bean实例（添加到一级缓存，并从二三级缓存中删除）

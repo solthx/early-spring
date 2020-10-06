@@ -9,7 +9,9 @@ import com.earlyspring.ioc.bean.annotation.Qualifier;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
@@ -44,6 +46,7 @@ public class BeanContainer extends AbstractBeanFactory {
     }
 
 
+    @Override
     public ApplicationContext getApplicationContext() {
         return applicationContext;
     }
@@ -64,7 +67,7 @@ public class BeanContainer extends AbstractBeanFactory {
     private List<String> beanNameList = new CopyOnWriteArrayList<>();
 
     // 某一类型的所有BeanName，用于类型推断
-    private ConcurrentHashMap<Class<?>, List<String>> getBeanNameByType = new ConcurrentHashMap<>(256);
+    private ConcurrentHashMap<Class<?>, List<String>> beanTypeMap = new ConcurrentHashMap<>(256);
 
     public ConcurrentHashMap<String, BeanDefinition> getBeanDefinitionMap() {
         return beanDefinitionMap;
@@ -74,8 +77,8 @@ public class BeanContainer extends AbstractBeanFactory {
         return beanNameList;
     }
 
-    public ConcurrentHashMap<Class<?>, List<String>> getGetBeanNameByType() {
-        return getBeanNameByType;
+    public ConcurrentHashMap<Class<?>, List<String>> getBeanTypeMap() {
+        return beanTypeMap;
     }
 
     public void setApplicationContext(ApplicationContext applicationContext) {
@@ -84,6 +87,8 @@ public class BeanContainer extends AbstractBeanFactory {
 
     /**
      * 根据beanName来获取bean对象
+     *
+     *
      * @param beanName
      * @return
      */
@@ -139,9 +144,45 @@ public class BeanContainer extends AbstractBeanFactory {
         }
         beanDefinitionMap.put(beanName, beanDefinition);
         beanNameList.add(beanName);
-        // 获取这个class的所有类型，并将其beanName更新到对于的类型里.
-//        List<Class<?>> types = new ArrayList<>();
+        // 更新beanTypeMap
+        addBeanTypeMap(beanName, beanDefinition);
+    }
 
+    /**
+     * 向beanTypeMap里增加一个beanDefinition的信息
+     *
+     * @param beanName
+     * @param bd
+     */
+    private void addBeanTypeMap(String beanName, BeanDefinition bd){
+        // 更新当前类
+        Class<?> clazz = bd.getClazz();
+        addBeanTypeMap(beanName, clazz);
+
+        // 父类
+        if ( null != clazz.getSuperclass() ){
+            addBeanTypeMap(beanName, clazz.getSuperclass());
+        }
+
+        // 接口类
+        if ( null != clazz.getInterfaces() ){
+            for( Class<?> itf:clazz.getInterfaces() ){
+                addBeanTypeMap(beanName, itf);
+            }
+        }
+
+    }
+
+    private void addBeanTypeMap(String beanName, Class<?> clazz){
+        if ( Object.class.equals(clazz) ){
+            return;
+        }
+        if ( !beanTypeMap.containsKey(clazz) ){
+            beanTypeMap.put(clazz, new ArrayList<>());
+        }
+
+        beanTypeMap.get(clazz)
+                .add(beanName);
     }
 
     @Override
@@ -345,4 +386,42 @@ public class BeanContainer extends AbstractBeanFactory {
         return res;
     }
 
+    /**
+     * 根据filter获取所有bean
+     * @param filter
+     * @return
+     */
+    public Map<String, Object> getBeanByFilter(Predicate<Object> filter){
+        Map<String, Object> res = new HashMap<>();
+//        for( Map.Entry<String, Object> entry:getSingletonMap().entrySet() ){
+//            if ( filter.test(entry.getValue()) ){
+//                res.put(entry.getKey(), entry.getValue());
+//            }
+//        }
+        for( String beanName:beanNameList ){
+            Object bean = getApplicationContext().getBean(beanName);
+            if ( filter.test(bean) ){
+                res.put(beanName, bean);
+            }
+        }
+        return res;
+    }
+
+    /**
+     * 获取所有指定类型的bean
+     *
+     * @param targetClass
+     * @return
+     */
+    public Map<String, Object> getBeansByType(Class<?> targetClass) {
+        List<String> beanNameList = beanTypeMap.get(targetClass);
+        Map<String, Object> resMap = new HashMap<>();
+        if ( beanNameList!=null ) {
+            for (String beanName : beanNameList) {
+                Object bean = getApplicationContext().getBean(beanName);
+                resMap.put(beanName, bean);
+            }
+        }
+        return resMap;
+    }
 }

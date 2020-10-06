@@ -1,5 +1,6 @@
 package com.earlyspring.ioc.container;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import com.earlyspring.ioc.bean.BeanDefinition;
 
@@ -14,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date 2020/5/11 11:04 下午
  */
 @Slf4j
+@Data
 public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
 
     // 一级缓存，存储的是创建完成的单例对象

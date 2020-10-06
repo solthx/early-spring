@@ -1,5 +1,9 @@
 package com.earlyspring.ioc.container;
 
+import com.earlyspring.ioc.callback.aware.ApplicationContextAware;
+import com.earlyspring.ioc.callback.aware.Aware;
+import com.earlyspring.ioc.callback.processor.Initializer;
+import com.earlyspring.ioc.context.ApplicationContext;
 import net.sf.cglib.proxy.MethodInterceptor;
 import com.earlyspring.aop.aspect.AutoProxyName;
 import com.earlyspring.aop.autoproxy.ProxyCreator;
@@ -34,8 +38,14 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
     private final List<BeanPostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();
 
+    private final List<Aware> awareProcessors = new CopyOnWriteArrayList<>();
+
     public List<BeanPostProcessor> getBeanPostProcessors() {
         return beanPostProcessors;
+    }
+
+    public List<Aware> getAwareProcessors() {
+        return awareProcessors;
     }
 
     // todo
@@ -70,7 +80,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
         // 3. 数据填充
         populate(beanDefinition, beanObject);
         // 4. 回调
-        // invokeInitialization(beanDefinition, beanObject);
+         invokeInitialization(beanDefinition, beanObject);
 
         // 检查是否需要代理（多例的情况）
 
@@ -156,11 +166,61 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
      * @param beanObject
      */
     private void invokeInitialization(BeanDefinition beanDefinition, Object beanObject) {
-        // Aware接口回调 todo
+        // Aware接口回调
+        awareCallBack(beanObject);
         // 初始化前
+        resolvePostPorcessorBeforeInitialization(beanDefinition, beanObject);
         // 初始化
+        doInitialize(beanObject);
         // 初始化后
-        // 检查是否需要代理
+        resolvePostPorcessorAfterInitialization(beanDefinition, beanObject);
+        // 检查是否需要代理（Deprecated）
+    }
+
+    /**
+     * 判断该bean是否实现了需要初始化的接口 或 注解(todo)
+     * @param beanObject
+     */
+    private void doInitialize(Object beanObject) {
+        if ( beanObject instanceof Initializer){
+            ((Initializer) beanObject).initialize();
+        }
+    }
+
+    /**
+     * 初始化后的后置处理器回调
+     * @param beanDefinition
+     * @param beanObject
+     */
+    private void resolvePostPorcessorAfterInitialization(BeanDefinition beanDefinition, Object beanObject) {
+        for( BeanPostProcessor beanPostProcessor:beanPostProcessors ){
+            beanObject = beanPostProcessor.postProcessAfterInitialization(beanObject, beanDefinition.getBeanName());
+        }
+    }
+
+    /**
+     * 初始化前的后置处理器回调
+     * @param beanDefinition
+     * @param beanObject
+     */
+    private void resolvePostPorcessorBeforeInitialization(BeanDefinition beanDefinition, Object beanObject) {
+        for( BeanPostProcessor beanPostProcessor:beanPostProcessors ){
+            beanObject = beanPostProcessor.postProcessBeforeInitialization(beanObject, beanDefinition.getBeanName());
+        }
+    }
+
+    public abstract ApplicationContext getApplicationContext();
+
+    /**
+     * aware接口回调
+     * @param beanObject
+     */
+    private void awareCallBack(Object beanObject) {
+        if (beanObject instanceof Aware) {
+            if (beanObject instanceof ApplicationContextAware) {
+                ((ApplicationContextAware) beanObject).setApplicationContext(getApplicationContext());
+            }
+        }
     }
 
 
