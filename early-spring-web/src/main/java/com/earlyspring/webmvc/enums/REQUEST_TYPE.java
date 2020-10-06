@@ -22,4 +22,17 @@ public enum REQUEST_TYPE {
     public Integer getType() {
         return type;
     }
+
+    public static REQUEST_TYPE getType(String type){
+        if ( "GET".equalsIgnoreCase(type) ){
+            return GET;
+        }else if ( "POST".equalsIgnoreCase(type) ){
+            return POST;
+        }else if ( "PUT".equalsIgnoreCase(type) ){
+            return PUT;
+        }else if ( "DELETE".equalsIgnoreCase(type) ){
+            return DELETE;
+        }
+        throw new RuntimeException("not found methodType : " + type);
+    }
 }

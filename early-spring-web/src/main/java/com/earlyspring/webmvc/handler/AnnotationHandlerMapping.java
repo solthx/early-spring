@@ -6,16 +6,20 @@ import com.earlyspring.ioc.callback.aware.ApplicationContextAware;
 import com.earlyspring.ioc.callback.processor.Initializer;
 import com.earlyspring.ioc.context.ApplicationContext;
 import com.earlyspring.utils.ValidationUtil;
+import com.earlyspring.webmvc.TestController;
 import com.earlyspring.webmvc.annotation.Filter;
 import com.earlyspring.webmvc.annotation.RequestEntrance;
 import com.earlyspring.webmvc.annotation.RequestParam;
 import com.earlyspring.webmvc.enums.REQUEST_TYPE;
+import com.earlyspring.webmvc.pattern.AntPathMatcher;
+import com.earlyspring.webmvc.pattern.PatternMatcher;
 import lombok.extern.slf4j.Slf4j;
 import org.omg.PortableInterceptor.Interceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +35,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class AnnotationHandlerMapping implements HandlerMapping, Initializer, ApplicationContextAware {
 
+    /* 根据request获取handler的映射 */
     private Map<RequestPathInfo, HandlerInfo> mapping = new ConcurrentHashMap<>();
 
+    /* 当前所有已经注册的拦截器 */
+    private List<HandlerInterceptor> allInterceptors = new ArrayList<>();
+
+    /* url-pattern-matcher */
+    private PatternMatcher matcher = new AntPathMatcher();
 
     private ApplicationContext applicationContext;
 
@@ -49,10 +59,14 @@ public class AnnotationHandlerMapping implements HandlerMapping, Initializer, Ap
         // 1. 获取handler
         HandlerInfo handlerInfo = mapping.get(requestPathInfo);
 
-        // 2. 获取interceptors
+        // 2. 根据handlerInfo和request来生成handlerExecutor
+        
+
+
+        // 3. 获取interceptors
         List<HandlerInterceptor> interceptors = matchInterceptors(requestPathInfo);
 
-        // 3. 生成HandlerExecutionChain并返回
+        // 4. 生成HandlerExecutionChain并返回
         HandlerExecutionChain handlerExecutionChain = createHandlerExecutionChain(requestPathInfo, interceptors);
 
         return handlerExecutionChain;
@@ -70,24 +84,43 @@ public class AnnotationHandlerMapping implements HandlerMapping, Initializer, Ap
     }
 
     /**
-     * todo 根据requestPathInfo获取所有匹配的拦截器(interceptor)
+     * 根据requestPathInfo获取所有匹配的拦截器(interceptor)
      *
      * @param requestPathInfo
      * @return
      */
     private List<HandlerInterceptor> matchInterceptors(RequestPathInfo requestPathInfo) {
-        return null;
+        String path = requestPathInfo.getPath();
+        List<HandlerInterceptor> matchList = new ArrayList<>();
+        for( HandlerInterceptor interceptor:allInterceptors ){
+            if ( isMatch(interceptor.getUrlPattern(), path) ){
+                matchList.add(interceptor);
+            }
+        }
+        return matchList;
     }
 
     /**
-     * todo
+     * 判断urlPattern是否能匹配到path
+     *
+     * @param urlPattern
+     * @param path
+     * @return
+     */
+    private boolean isMatch(String urlPattern, String path) {
+        return matcher.matches(urlPattern, path);
+    }
+
+    /**
      * httpRequest => RequestPathInfo
      *
      * @param request
      * @return
      */
     private RequestPathInfo createRequestPathInfo(HttpServletRequest request) {
-        return null;
+        String method = request.getMethod();
+        String path = request.getPathInfo(); //todo: test
+        return new RequestPathInfo(path, REQUEST_TYPE.getType(path));
     }
 
     /**
@@ -95,8 +128,24 @@ public class AnnotationHandlerMapping implements HandlerMapping, Initializer, Ap
      */
     @Override
     public void initialize() {
-        // 初始化handlermapping，并放到list中
+        initHandlers();
+        initInterceptors();
+    }
 
+    /**
+     * 初始化所有的拦截器
+     */
+    private void initInterceptors() {
+        Map<String, Object> interceptors = applicationContext.getBeansByType(HandlerInterceptor.class);
+        for( Map.Entry<String, Object> entry:interceptors.entrySet() ){
+            allInterceptors.add((HandlerInterceptor) entry);
+        }
+    }
+
+    /**
+     * 初始化handlers
+     */
+    private void initHandlers() {
         // 1. 获取所有Controller
         Map<String, Object> controllersMaps = applicationContext.getBeansWithAnnotations(Controller.class);
 

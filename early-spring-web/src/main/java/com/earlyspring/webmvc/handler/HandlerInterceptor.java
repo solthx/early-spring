@@ -12,15 +12,22 @@ import javax.servlet.http.HttpServletResponse;
 public interface HandlerInterceptor {
 
     /**
+     * 返回过滤路径
+     *
+     * @return
+     */
+    String getUrlPattern();
+
+    /**
      * 在Handler执行前进行拦截
      *
      * @param req
      * @param resp
-     * @param handler
+     * @param handlerExecutor
      * @return
      * @throws Exception
      */
-    default boolean beforeHandle(HttpServletRequest req, HttpServletResponse resp, Handler handler) throws Exception {
+    default boolean beforeHandle(HttpServletRequest req, HttpServletResponse resp, HandlerExecutor handlerExecutor) throws Exception {
         return true;
     }
 
