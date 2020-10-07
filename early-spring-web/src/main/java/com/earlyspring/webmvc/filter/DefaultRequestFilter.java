@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Slf4j
 @Component
-public class PreRequestProcessor implements HandlerInterceptor{
+public class DefaultRequestFilter implements HandlerInterceptor{
 
 
     /**

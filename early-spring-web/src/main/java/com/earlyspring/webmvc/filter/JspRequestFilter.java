@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
  * jsp资源请求处理
  */
 @Component
-public class JspRequestProcessor implements HandlerInterceptor, ApplicationContextAware, Initializer {
+public class JspRequestFilter implements HandlerInterceptor, ApplicationContextAware, Initializer {
 
     //jsp请求的RequestDispatcher的名称
     private static final String JSP_SERVLET = "jsp";
@@ -31,7 +31,7 @@ public class JspRequestProcessor implements HandlerInterceptor, ApplicationConte
 
     private ApplicationContext applicationContext;
 
-    public JspRequestProcessor() {
+    public JspRequestFilter() {
 
     }
 

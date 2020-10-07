@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Slf4j
 @Component
-public class StaticResourceRequestProcessor implements HandlerInterceptor, ApplicationContextAware, Initializer{
+public class StaticResourceRequestFilter implements HandlerInterceptor, ApplicationContextAware, Initializer{
 
     public static final String DEFAULT_TOMCAT_SERVLET = "default";
     public static final String STATIC_RESOURCE_PREFIX = "/static/";
@@ -27,7 +27,7 @@ public class StaticResourceRequestProcessor implements HandlerInterceptor, Appli
     RequestDispatcher defaultDispatcher;
     private ApplicationContext applicationContext;
 
-    public StaticResourceRequestProcessor() {
+    public StaticResourceRequestFilter() {
     }
 
     //通过请求路径前缀（目录）是否为静态资源 /static/
