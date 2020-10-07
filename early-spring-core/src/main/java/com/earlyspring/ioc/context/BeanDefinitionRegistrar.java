@@ -1,5 +1,7 @@
 package com.earlyspring.ioc.context;
 
+import com.earlyspring.commons.utils.ClassUtils;
+import com.earlyspring.commons.utils.ValidationUtils;
 import lombok.extern.log4j.Log4j;
 import com.earlyspring.ioc.bean.annotation.Import;
 import com.earlyspring.ioc.container.BeanContainer;
@@ -7,8 +9,6 @@ import com.earlyspring.ioc.bean.BeanDefinition;
 import com.earlyspring.ioc.bean.annotation.TargetAnnotation;
 import com.earlyspring.ioc.bean.annotation.ComponentScan;
 import com.earlyspring.ioc.bean.annotation.ComponentScans;
-import com.earlyspring.utils.ClassUtil;
-import com.earlyspring.utils.ValidationUtil;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;
@@ -86,20 +86,22 @@ public class BeanDefinitionRegistrar{
     private void scanPackageToRegister(ComponentScan annotation) {
         System.out.println("扫描:"+annotation.value());
         String packageName = annotation.value();
-        if (ValidationUtil.isEmpty(packageName)){
+        if (ValidationUtils.isEmpty(packageName)){
             // print log
             log.warn("包名不正确...");
             return;
         }
-        Set<Class<?>> classes = ClassUtil.scanPackage(packageName, ClassesHasRegistered);
-        for( Class<?> clazz:classes ){
-            for( Class<? extends Annotation> beanAnnotationClass:TargetAnnotation.BEAN_ANNOTATION )
-                // 只要存在被Component、Service、Controller、Repository标记的注解
-                // 都应该作为bean被注册进去
-                if (clazz.isAnnotationPresent(beanAnnotationClass)) {
-                    registerBean(clazz);
-                    break;
-                }
+        Set<Class<?>> classes = ClassUtils.scanPackage(packageName, ClassesHasRegistered);
+        if ( classes!=null ) {
+            for (Class<?> clazz : classes) {
+                for (Class<? extends Annotation> beanAnnotationClass : TargetAnnotation.BEAN_ANNOTATION)
+                    // 只要存在被Component、Service、Controller、Repository标记的注解
+                    // 都应该作为bean被注册进去
+                    if (clazz.isAnnotationPresent(beanAnnotationClass)) {
+                        registerBean(clazz);
+                        break;
+                    }
+            }
         }
     }
 

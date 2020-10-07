@@ -1,6 +1,7 @@
 package com.earlyspring.webmvc.pattern;
 
-import com.earlyspring.utils.StringUtils;
+
+import com.earlyspring.commons.utils.StringUtils;
 
 /**
  * @author shiro.framework

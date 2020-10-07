@@ -1,28 +1,22 @@
 package com.earlyspring.webmvc.handler;
 
+import com.earlyspring.commons.utils.ValidationUtils;
 import com.earlyspring.ioc.bean.annotation.Component;
 import com.earlyspring.ioc.bean.annotation.Controller;
 import com.earlyspring.ioc.callback.aware.ApplicationContextAware;
 import com.earlyspring.ioc.callback.processor.Initializer;
 import com.earlyspring.ioc.context.ApplicationContext;
-import com.earlyspring.utils.ValidationUtil;
-import com.earlyspring.webmvc.TestController;
-import com.earlyspring.webmvc.annotation.Filter;
 import com.earlyspring.webmvc.annotation.RequestEntrance;
 import com.earlyspring.webmvc.annotation.RequestParam;
 import com.earlyspring.webmvc.enums.REQUEST_TYPE;
 import com.earlyspring.webmvc.pattern.AntPathMatcher;
 import com.earlyspring.webmvc.pattern.PatternMatcher;
 import lombok.extern.slf4j.Slf4j;
-import org.omg.PortableInterceptor.Interceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -59,28 +53,33 @@ public class AnnotationHandlerMapping implements HandlerMapping, Initializer, Ap
         // 1. 获取handler
         HandlerInfo handlerInfo = mapping.get(requestPathInfo);
 
-        // 2. 根据handlerInfo和request来生成handlerExecutor
-        
+        if ( handlerInfo==null ){
+            log.info("not found request path {}", requestPathInfo.getPath());
+            return null;
+        }
 
+
+        // 2. 根据handlerInfo和request来生成handlerExecutor
+        RequestHandlerExecutor executor = new RequestHandlerExecutor(handlerInfo, request);
 
         // 3. 获取interceptors
         List<HandlerInterceptor> interceptors = matchInterceptors(requestPathInfo);
 
         // 4. 生成HandlerExecutionChain并返回
-        HandlerExecutionChain handlerExecutionChain = createHandlerExecutionChain(requestPathInfo, interceptors);
+        HandlerExecutionChain handlerExecutionChain = createHandlerExecutionChain(executor, interceptors);
 
         return handlerExecutionChain;
     }
 
     /**
-     * todo 组装生成HandlerExecutionChain
+     * 组装生成HandlerExecutionChain
      *
-     * @param requestPathInfo
+     * @param executor
      * @param interceptors
      * @return
      */
-    private HandlerExecutionChain createHandlerExecutionChain(RequestPathInfo requestPathInfo, List<HandlerInterceptor> interceptors) {
-        return null;
+    private HandlerExecutionChain createHandlerExecutionChain(RequestHandlerExecutor executor, List<HandlerInterceptor> interceptors) {
+        return new HandlerExecutionChain(executor, interceptors);
     }
 
     /**
@@ -119,8 +118,8 @@ public class AnnotationHandlerMapping implements HandlerMapping, Initializer, Ap
      */
     private RequestPathInfo createRequestPathInfo(HttpServletRequest request) {
         String method = request.getMethod();
-        String path = request.getPathInfo(); //todo: test
-        return new RequestPathInfo(path, REQUEST_TYPE.getType(path));
+        String path = formatUrl(request.getPathInfo()); //todo: test
+        return new RequestPathInfo(path, REQUEST_TYPE.getType(method));
     }
 
     /**
@@ -182,12 +181,13 @@ public class AnnotationHandlerMapping implements HandlerMapping, Initializer, Ap
 
                 RequestPathInfo requestPathInfo = new RequestPathInfo(urlPredix + urlSuffix, type);
 
-                Map<String, Class<?>> methodParams = new HashMap<>();
+                // 保证参数顺序
+                Map<String, Class<?>> methodParams = new LinkedHashMap<>();
 
                 /* key: 参数名(若无RequestParam注解，则取定义时的name, 若有则取注解中定义的name) */
                 /* value: 参数类型 */
                 Parameter[] parameters = method.getParameters();
-                if (!ValidationUtil.isEmpty(parameters)) {
+                if (!ValidationUtils.isEmpty(parameters)) {
                     for (Parameter parameter : parameters) {
                         RequestParam param = parameter.getAnnotation(RequestParam.class);
                         if ( param!=null ) {

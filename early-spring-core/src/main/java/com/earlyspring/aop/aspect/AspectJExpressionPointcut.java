@@ -1,7 +1,7 @@
 package com.earlyspring.aop.aspect;
 
-import com.earlyspring.utils.ClassUtil;
-import com.earlyspring.utils.StringUtils;
+import com.earlyspring.commons.utils.ClassUtils;
+import com.earlyspring.commons.utils.StringUtils;
 import org.aspectj.weaver.reflect.ReflectionWorld;
 import org.aspectj.weaver.tools.*;
 
@@ -85,7 +85,7 @@ public class AspectJExpressionPointcut implements PointCut, MethodMatcher {
         }
         if (this.pointcutExpression == null) {
             //加载类
-            this.pointcutClassLoader = ClassUtil.getClassLoader();
+            this.pointcutClassLoader = ClassUtils.getClassLoader();
             this.pointcutExpression = buildPointcutException(this.pointcutClassLoader);
 
         }

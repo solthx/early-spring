@@ -1,8 +1,8 @@
 package com.earlyspring.ioc.bean;
 
 
+import com.earlyspring.commons.utils.ValidationUtils;
 import com.earlyspring.ioc.bean.annotation.*;
-import com.earlyspring.utils.ValidationUtil;
 import lombok.Data;
 
 import java.lang.annotation.Annotation;
@@ -53,11 +53,11 @@ public class BeanDefinition {
         for ( Class<? extends Annotation> klass: TargetAnnotation.BEAN_ANNOTATION )
             if (clazz.isAnnotationPresent(klass)){
                 BeanName = getBeanName(clazz.getAnnotation(klass));
-                if (!ValidationUtil.isEmpty(BeanName))
+                if (!ValidationUtils.isEmpty(BeanName))
                     break;
             }
         // 如果没有声明BeanName的话，那么就默认是类的SimpleName
-        if ( ValidationUtil.isEmpty(BeanName) )
+        if ( ValidationUtils.isEmpty(BeanName) )
             BeanName = clazz.getSimpleName();
     }
 

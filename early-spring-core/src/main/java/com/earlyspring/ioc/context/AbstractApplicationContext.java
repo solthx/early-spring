@@ -287,7 +287,8 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
      * @param beanName
      * @param singletonBean
      */
-    private void registerSingleton(String beanName, Object singletonBean) {
+    @Override
+    public void registerSingleton(String beanName, Object singletonBean) {
         beanContainer.registerSingleton(beanName, singletonBean);
     }
 

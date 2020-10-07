@@ -1,4 +1,4 @@
-package com.earlyspring.utils;
+package com.earlyspring.commons.utils;
 
 import java.util.Collection;
 import java.util.Map;
@@ -7,7 +7,7 @@ import java.util.Map;
  * @author czf
  * @Date 2020/5/9 1:52 下午
  */
-public class ValidationUtil {
+public class ValidationUtils {
     /**
      * String是否为null或""
      *

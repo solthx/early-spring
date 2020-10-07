@@ -1,23 +1,26 @@
-package com.earlyspring.utils;
+package com.earlyspring.commons.utils;
 
-import com.earlyspring.ioc.context.BeanDefinitionRegistrar;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.jar.JarFile;
 
 /**
  * @author czf
  * @Date 2020/5/8 8:03 下午
  */
-@Log4j
-public class ClassUtil {
+@Slf4j
+public class ClassUtils {
     /**
      * 扫描包
      * @param packageName 包名
@@ -30,18 +33,32 @@ public class ClassUtil {
         ClassLoader classLoader = getClassLoader();
         // 2. 通过类加载器获取该包在os下的url
         URL url = classLoader.getResource(packageName.replace(".", "/"));
-        if ( url==null ||  url.getProtocol()!="file"){
+        if ( url==null ||  (!url.getProtocol().equals("file") && !url.getProtocol().equals("jar")) ){
             // print log
             // System.out.println("包路径不正确...");
             log.warn("包路径不正确..."+packageName);
             return null;
         }
+        String path = null;
+        URLConnection connection = null;
         // 得到了包在os下对应的目录
         File AbsolutePackageDir = null;
+
         try {
-            AbsolutePackageDir = new File(url.toURI().getPath());
-        } catch (URISyntaxException e) {
-            // to replace
+            connection = url.openConnection();
+            if(connection instanceof JarURLConnection) {
+                JarFile jarFile = ((JarURLConnection) connection).getJarFile();
+                path = jarFile.getName();
+                int separator = path.indexOf("!/");
+                if (separator > 0) {
+                    path = path.substring(0, separator);
+                }
+            } else {
+                path = url.toURI().getPath();
+            }
+            AbsolutePackageDir = new File(path);
+
+        } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
 
@@ -121,16 +138,6 @@ public class ClassUtil {
         if (dirs!=null)
             for ( File f:dirs )
                 collectFileFromDir(fileSet, f, pattern);
-    }
-
-    /**
-     * 测试
-     * @param args
-     */
-    public static void main(String[] args) throws URISyntaxException {
-        Set<Class<?>> classes = scanPackage("com.web.entity", BeanDefinitionRegistrar.ClassesHasRegistered);
-        for(Class c:classes)
-            System.out.println(c.getSimpleName());
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.earlyspring.utils;
+package com.earlyspring.commons.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;

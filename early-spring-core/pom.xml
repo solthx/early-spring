@@ -20,6 +20,12 @@
     <dependencies>
 
         <dependency>
+            <groupId>com.czf</groupId>
+            <artifactId>early-spring-commons</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.sun.istack</groupId>
             <artifactId>istack-commons-tools</artifactId>
             <version>3.0.10</version>

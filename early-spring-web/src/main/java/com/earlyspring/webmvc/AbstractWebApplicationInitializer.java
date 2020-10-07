@@ -2,6 +2,7 @@ package com.earlyspring.webmvc;
 
 import com.earlyspring.ioc.context.AnnotationApplicationContext;
 import com.earlyspring.ioc.context.ApplicationContext;
+import com.earlyspring.webmvc.enums.BEAN_NAME;
 import com.earlyspring.webmvc.servlet.DispatcherServlet;
 
 import javax.servlet.ServletContext;
@@ -27,6 +28,8 @@ public abstract class AbstractWebApplicationInitializer implements WebApplicatio
         DispatcherServlet dispatcherServlet = createDispatcherServlet(applicationContext);
         // 注册
         dispatcherServlet.register(servletContext);
+        // servletContext注册到ioc容器中
+        applicationContext.registerSingleton(BEAN_NAME.SERVLET_CONTEXT.getBeanName(),servletContext );
     }
 
     private DispatcherServlet createDispatcherServlet(ApplicationContext applicationContext) {

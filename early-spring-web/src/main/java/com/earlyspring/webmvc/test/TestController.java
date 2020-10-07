@@ -1,4 +1,4 @@
-package com.earlyspring.webmvc;
+package com.earlyspring.webmvc.test;
 
 import com.earlyspring.ioc.bean.annotation.Controller;
 import com.earlyspring.webmvc.annotation.RequestEntrance;
@@ -13,7 +13,7 @@ import com.earlyspring.webmvc.annotation.RequestParam;
 public class TestController {
 
     @RequestEntrance(pattern = "czf")
-    public String hello(@RequestParam("homono") String fake){
-        return "hello";
+    public String hello(@RequestParam("wd") String wd){
+        return "hello, " +wd;
     }
 }

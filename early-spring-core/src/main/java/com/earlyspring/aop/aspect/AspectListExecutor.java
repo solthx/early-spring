@@ -1,6 +1,6 @@
 package com.earlyspring.aop.aspect;
 
-import com.earlyspring.utils.ValidationUtil;
+import com.earlyspring.commons.utils.ValidationUtils;
 import lombok.Getter;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -47,7 +47,7 @@ public class AspectListExecutor implements MethodInterceptor {
     @Override
     public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
         Object returnValue = null;
-        if(ValidationUtil.isEmpty(sortedAspectInfoList)){
+        if(ValidationUtils.isEmpty(sortedAspectInfoList)){
             returnValue = methodProxy.invokeSuper(proxy, args);
             return returnValue;
         }

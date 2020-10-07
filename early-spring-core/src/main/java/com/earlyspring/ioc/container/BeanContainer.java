@@ -1,8 +1,8 @@
 package com.earlyspring.ioc.container;
 
 
+import com.earlyspring.commons.utils.ClassUtils;
 import com.earlyspring.ioc.context.ApplicationContext;
-import com.earlyspring.utils.ClassUtil;
 import lombok.extern.log4j.Log4j;
 import com.earlyspring.ioc.bean.BeanDefinition;
 import com.earlyspring.ioc.bean.annotation.Qualifier;
@@ -253,7 +253,7 @@ public class BeanContainer extends AbstractBeanFactory {
             log.warn("@Value当前仅支持基本类型的数据注入, spel, spei功能尚未实现...");
             return;
         }
-        ClassUtil.setField(field,beanObject, val, accessible);
+        ClassUtils.setField(field,beanObject, val, accessible);
     }
 
     private boolean valueTypeIsValid(Class<?> type) {
@@ -348,7 +348,8 @@ public class BeanContainer extends AbstractBeanFactory {
             log.warn("注入失败...未找到指定bean: "+beanName);
             return;
         }
-        ClassUtil.setField(field, beanObject, valueBean, accessible);
+        ClassUtils.setField(field, beanObject, valueBean, accessible);
+
     }
 
     /**

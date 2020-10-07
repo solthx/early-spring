@@ -1,7 +1,12 @@
 package com.earlyspring.webmvc.servlet;
 
+import com.earlyspring.ioc.bean.annotation.AutoWired;
+import com.earlyspring.ioc.bean.annotation.Component;
 import com.earlyspring.ioc.context.ApplicationContext;
+import com.earlyspring.webmvc.handler.AnnotationHandlerMapping;
+import com.earlyspring.webmvc.handler.HandlerExecutionChain;
 import com.earlyspring.webmvc.handler.HandlerMapping;
+import lombok.SneakyThrows;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
@@ -19,7 +24,7 @@ public class DispatcherServlet extends AbstractDispatcherServlet {
 
     private ApplicationContext applicationContext;
 
-    private List<HandlerMapping> handlerMappingList;
+    private HandlerMapping handlerMapping;
 
     public DispatcherServlet(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
@@ -39,9 +44,17 @@ public class DispatcherServlet extends AbstractDispatcherServlet {
      * @param req
      * @param resp
      */
+    @SneakyThrows
     @Override
     protected void doDispatch(HttpServletRequest req, HttpServletResponse resp) {
+        // 1. 获取executionChain
+        HandlerExecutionChain executionChain = handlerMapping.getHandler(req);
 
+        // 2. 调用executionChain, 更新render
+        // todo
+
+        // 3. 执行render， 更新response
+        // todo
     }
 
     /**
@@ -56,6 +69,6 @@ public class DispatcherServlet extends AbstractDispatcherServlet {
      * 初始化HandlerMapping
      */
     private void initHandlerMapping() {
-
+        this.handlerMapping = (HandlerMapping) applicationContext.getBean("AnnotationHandlerMapping");
     }
 }

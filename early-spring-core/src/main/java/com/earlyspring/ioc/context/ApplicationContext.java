@@ -14,4 +14,6 @@ public interface ApplicationContext extends BeanFactory {
     Map<String, Object> getBeansWithAnnotations(Class<? extends Annotation> annotationClass);
 
     Map<String, Object> getBeansByType(Class<?> targetClass);
+
+    void registerSingleton(String beanName, Object bean);
 }

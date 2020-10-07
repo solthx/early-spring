@@ -9,6 +9,7 @@
         <module>early-spring-core</module>
         <module>early-spring-example</module>
         <module>early-spring-web</module>
+        <module>early-spring-commons</module>
     </modules>
 
     <groupId>com.czf</groupId>
@@ -20,6 +21,11 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.czf</groupId>
+            <artifactId>early-spring-commons</artifactId>
+            <version>${version}</version>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>

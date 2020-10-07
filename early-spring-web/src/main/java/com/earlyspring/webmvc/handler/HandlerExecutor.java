@@ -1,7 +1,5 @@
 package com.earlyspring.webmvc.handler;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * handler执行器
  *
@@ -10,5 +8,5 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface HandlerExecutor {
 
-    void execute();
+    Object execute();
 }
