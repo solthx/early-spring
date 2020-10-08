@@ -118,7 +118,7 @@ public class AnnotationHandlerMapping implements HandlerMapping, Initializer, Ap
      */
     private RequestPathInfo createRequestPathInfo(HttpServletRequest request) {
         String method = request.getMethod();
-        String path = formatUrl(request.getPathInfo()); //todo: test
+        String path = formatUrl(request.getPathInfo());
         return new RequestPathInfo(path, REQUEST_TYPE.getType(method));
     }
 

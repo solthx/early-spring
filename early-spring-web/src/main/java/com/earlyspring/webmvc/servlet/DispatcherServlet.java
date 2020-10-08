@@ -58,11 +58,9 @@ public class DispatcherServlet extends AbstractDispatcherServlet {
         }
 
         // 2. 调用executionChain, 更新render
-        // todo
         executionChain.executeChain(req, resp);
 
         // 3. 执行render， 更新response
-        // todo
         executionChain.doRender(req, resp);
     }
 

@@ -172,7 +172,6 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
      * @param objectFactory
      */
     protected void addSigletonObjectFactory(String beanName, BeanObjectFactory<?> objectFactory){
-        // todo
         // singletonsFactory是并发容器
         // singletonsFactory.put(beanName, objectFactory);
         synchronized (this.singletonMap) {

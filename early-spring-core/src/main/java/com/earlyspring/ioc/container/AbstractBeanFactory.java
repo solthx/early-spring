@@ -157,9 +157,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
     /**
      * bean创建完成后的初始化回调
      *
-     * 1. Aware接口回调 todo
-     * 2. postProcessBeforeInitialization todo
-     * 3. 初始化  todo
+     * 1. Aware接口回调
+     * 2. postProcessBeforeInitialization
+     * 3. 初始化
      * 4. postProcessAfterInitialization（在这里进行AOP）
      *
      * @param beanDefinition
