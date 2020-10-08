@@ -5,6 +5,7 @@ import com.earlyspring.ioc.callback.aware.ApplicationContextAware;
 import com.earlyspring.ioc.callback.processor.Initializer;
 import com.earlyspring.ioc.context.ApplicationContext;
 import com.earlyspring.webmvc.enums.BEAN_NAME;
+import com.earlyspring.webmvc.handler.HandlerExecutionChain;
 import com.earlyspring.webmvc.handler.HandlerExecutor;
 import com.earlyspring.webmvc.handler.HandlerInterceptor;
 
@@ -17,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
  * jsp资源请求处理
  */
 @Component
-public class JspRequestFilter implements HandlerInterceptor, ApplicationContextAware, Initializer {
+public class JspRequestFilter implements HandlerInterceptor, ApplicationContextAware{
 
     //jsp请求的RequestDispatcher的名称
     private static final String JSP_SERVLET = "jsp";
@@ -41,13 +42,16 @@ public class JspRequestFilter implements HandlerInterceptor, ApplicationContextA
      *
      * @param req
      * @param resp
-     * @param handlerExecutor
+     * @param executionChain
      * @return
      * @throws Exception
      */
     @Override
-    public boolean beforeHandle(HttpServletRequest req, HttpServletResponse resp, HandlerExecutor handlerExecutor) throws Exception {
+    public boolean beforeHandle(HttpServletRequest req, HttpServletResponse resp, HandlerExecutionChain executionChain) throws Exception {
         if ( isJspResource(req.getPathInfo()) ){
+            if (jspServlet==null){
+                initialize();
+            }
             jspServlet.forward(req, resp);
             return false;
         }
@@ -79,7 +83,6 @@ public class JspRequestFilter implements HandlerInterceptor, ApplicationContextA
     /**
      * 初始化方法
      */
-    @Override
     public void initialize() {
         ServletContext servletContext = (ServletContext) applicationContext.getBean(BEAN_NAME.SERVLET_CONTEXT.getBeanName());
         if ( null == servletContext ){

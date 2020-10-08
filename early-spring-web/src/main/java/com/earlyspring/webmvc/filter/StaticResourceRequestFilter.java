@@ -5,6 +5,7 @@ import com.earlyspring.ioc.callback.aware.ApplicationContextAware;
 import com.earlyspring.ioc.callback.processor.Initializer;
 import com.earlyspring.ioc.context.ApplicationContext;
 import com.earlyspring.webmvc.enums.BEAN_NAME;
+import com.earlyspring.webmvc.handler.HandlerExecutionChain;
 import com.earlyspring.webmvc.handler.HandlerExecutor;
 import com.earlyspring.webmvc.handler.HandlerInterceptor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Slf4j
 @Component
-public class StaticResourceRequestFilter implements HandlerInterceptor, ApplicationContextAware, Initializer{
+public class StaticResourceRequestFilter implements HandlerInterceptor, ApplicationContextAware{
 
     public static final String DEFAULT_TOMCAT_SERVLET = "default";
     public static final String STATIC_RESOURCE_PREFIX = "/static/";
@@ -43,7 +44,6 @@ public class StaticResourceRequestFilter implements HandlerInterceptor, Applicat
     /**
      * 初始化方法
      */
-    @Override
     public void initialize() {
         ServletContext servletContext = (ServletContext) applicationContext.getBean(BEAN_NAME.SERVLET_CONTEXT.getBeanName());
         if ( null == servletContext ){
@@ -71,15 +71,18 @@ public class StaticResourceRequestFilter implements HandlerInterceptor, Applicat
      *
      * @param req
      * @param resp
-     * @param handlerExecutor
+     * @param executionChain
      * @return
      * @throws Exception
      */
     @Override
-    public boolean beforeHandle(HttpServletRequest req, HttpServletResponse resp, HandlerExecutor handlerExecutor) throws Exception {
+    public boolean beforeHandle(HttpServletRequest req, HttpServletResponse resp, HandlerExecutionChain executionChain) throws Exception {
         //1.通过请求路径判断是否是请求的静态资源 webapp/static
         if(isStaticResource(req.getPathInfo())){
             //2.如果是静态资源，则将请求转发给default servlet处理
+            if ( defaultDispatcher == null ){
+                initialize();
+            }
             defaultDispatcher.forward(req, resp);
             return false;
         }

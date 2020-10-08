@@ -57,7 +57,7 @@ public class ConverterUtils {
      * @param type 参数类型
      * @return 是否为基本数据类型
      */
-    private static boolean isPrimitive(Class<?> type) {
+    public static boolean isPrimitive(Class<?> type) {
         return type == boolean.class
                 || type == Boolean.class
                 || type == double.class

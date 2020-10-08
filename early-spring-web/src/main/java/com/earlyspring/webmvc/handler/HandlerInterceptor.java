@@ -23,11 +23,11 @@ public interface HandlerInterceptor {
      *
      * @param req
      * @param resp
-     * @param handlerExecutor
+     * @param handlerExecutionChain
      * @return
      * @throws Exception
      */
-    default boolean beforeHandle(HttpServletRequest req, HttpServletResponse resp, HandlerExecutor handlerExecutor) throws Exception {
+    default boolean beforeHandle(HttpServletRequest req, HttpServletResponse resp, HandlerExecutionChain handlerExecutionChain) throws Exception {
         return true;
     }
 
@@ -38,7 +38,7 @@ public interface HandlerInterceptor {
      * @param resp
      * @throws Exception
      */
-    default void afterHandle(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    default void afterHandle(HttpServletRequest req, HttpServletResponse resp, HandlerExecutionChain handlerExecutionChain) throws Exception {
 
     }
 

@@ -7,6 +7,7 @@ import com.earlyspring.webmvc.handler.AnnotationHandlerMapping;
 import com.earlyspring.webmvc.handler.HandlerExecutionChain;
 import com.earlyspring.webmvc.handler.HandlerMapping;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
@@ -18,6 +19,7 @@ import java.util.List;
  * @author czf
  * @Date 2020/10/3 11:00 上午
  */
+@Slf4j
 public class DispatcherServlet extends AbstractDispatcherServlet {
 
     private static final String SERVLET_NAME = "dispatcher";
@@ -50,11 +52,18 @@ public class DispatcherServlet extends AbstractDispatcherServlet {
         // 1. 获取executionChain
         HandlerExecutionChain executionChain = handlerMapping.getHandler(req);
 
+        if ( executionChain == null ){
+            log.warn("not found path handler : path={}， method={}", req.getPathInfo(),req.getMethod());
+            return ;
+        }
+
         // 2. 调用executionChain, 更新render
         // todo
+        executionChain.executeChain(req, resp);
 
         // 3. 执行render， 更新response
         // todo
+        executionChain.doRender(req, resp);
     }
 
     /**

@@ -2,6 +2,7 @@ package com.earlyspring.webmvc.handler;
 
 import com.earlyspring.commons.utils.ConverterUtils;
 import com.earlyspring.ioc.container.BeanContainer;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,8 +21,10 @@ public class RequestHandlerExecutor implements HandlerExecutor {
 
     private BeanContainer beanContainer = BeanContainer.getInstance();
 
+    @Getter
     private HandlerInfo handlerInfo;
 
+    @Getter
     private HttpServletRequest request;
 
 

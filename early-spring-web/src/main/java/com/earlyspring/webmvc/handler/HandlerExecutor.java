@@ -9,4 +9,6 @@ package com.earlyspring.webmvc.handler;
 public interface HandlerExecutor {
 
     Object execute();
+
+    HandlerInfo getHandlerInfo();
 }

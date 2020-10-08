@@ -137,7 +137,7 @@ public class AnnotationHandlerMapping implements HandlerMapping, Initializer, Ap
     private void initInterceptors() {
         Map<String, Object> interceptors = applicationContext.getBeansByType(HandlerInterceptor.class);
         for( Map.Entry<String, Object> entry:interceptors.entrySet() ){
-            allInterceptors.add((HandlerInterceptor) entry);
+            allInterceptors.add((HandlerInterceptor) entry.getValue());
         }
     }
 
