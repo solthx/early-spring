@@ -13,9 +13,9 @@ import com.earlyspring.webmvc.annotation.RequestParam;
 @RequestEntrance(pattern = "/demo")
 public class TestController {
 
-    @RequestEntrance(pattern = "czf")
+    @RequestEntrance(pattern = "test")
     @AsResponse
-    public String hello(@RequestParam("name") String abcd){
+    public String hello(@RequestParam("param") String abcd){
         return "hello, " + abcd;
     }
 }
