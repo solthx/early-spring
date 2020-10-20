@@ -2,14 +2,14 @@
 
 ## 进度:
 
-- ### 已经实现的功能:
-    1. Component/Controller/Respository/Service（标记Bean）√
-    2. ComponentScan/ComponentScans/Import（扫描包, 解决扫描包的循环依赖）√
-    3. AutoWired/Qualifier/Value（按类型/BeanName自动装入，按值自动装入）√
-    4. Lazy/Scope（配置Bean是否懒加载, 是否为单例）√
-    5. Aspect（标记当前类为切面类）√， Order（为切面类设置调用优先级）√
-    6. EnableAspectAutoProxy（一键启动aop）√
-    7. 支持单例Bean循环依赖，同时也能够支持aop单例Bean的循环依赖 √
+### 已经实现的功能:
+- [x] Component/Controller/Respository/Service（标记Bean）√
+- [x] ComponentScan/ComponentScans/Import（扫描包, 解决扫描包的循环依赖）√
+- [x] AutoWired/Qualifier/Value（按类型/BeanName自动装入，按值自动装入）√
+- [x] Lazy/Scope（配置Bean是否懒加载, 是否为单例）√
+- [x] Aspect（标记当前类为切面类）√， Order（为切面类设置调用优先级）√
+- [x] EnableAspectAutoProxy（一键启动aop）√
+- [x] 支持单例Bean循环依赖，同时也能够支持aop单例Bean的循环依赖 √
 
  - ### 逻辑主干简介：
     - IOC的主干：
