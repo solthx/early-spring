@@ -6,7 +6,7 @@ import com.earlyspring.ioc.bean.annotation.Controller;
 import com.earlyspring.ioc.callback.aware.ApplicationContextAware;
 import com.earlyspring.ioc.callback.processor.Initializer;
 import com.earlyspring.ioc.context.ApplicationContext;
-import com.earlyspring.webmvc.annotation.RequestEntrance;
+import com.earlyspring.webmvc.annotation.RequestMapping;
 import com.earlyspring.webmvc.annotation.RequestParam;
 import com.earlyspring.webmvc.enums.REQUEST_TYPE;
 import com.earlyspring.webmvc.pattern.AntPathMatcher;
@@ -165,17 +165,17 @@ public class AnnotationHandlerMapping implements HandlerMapping, Initializer, Ap
         String urlSuffix = "";
 
 
-        /* 处理class上标注的RequestEntrance */
-        if ( controllerBean.getClass().isAnnotationPresent(RequestEntrance.class) ){
-            RequestEntrance requestEntrance = controllerBean.getClass().getAnnotation(RequestEntrance.class);
-            urlPredix = formatUrl(requestEntrance.pattern());
+        /* 处理class上标注的RequestMapping */
+        if ( controllerBean.getClass().isAnnotationPresent(RequestMapping.class) ){
+            RequestMapping requestMapping = controllerBean.getClass().getAnnotation(RequestMapping.class);
+            urlPredix = formatUrl(requestMapping.pattern());
         }
 
 
-        /* 处理method上标注的RequestEntrance */
+        /* 处理method上标注的RequestMapping */
         for(Method method:controllerBean.getClass().getDeclaredMethods()){
-            if ( method.isAnnotationPresent(RequestEntrance.class) ){
-                RequestEntrance reqEntrance = method.getAnnotation(RequestEntrance.class);
+            if ( method.isAnnotationPresent(RequestMapping.class) ){
+                RequestMapping reqEntrance = method.getAnnotation(RequestMapping.class);
                 urlSuffix = formatUrl(reqEntrance.pattern());
                 REQUEST_TYPE type = reqEntrance.type();
 

@@ -1,6 +1,6 @@
 package com.earlyspring.webmvc.handler;
 
-import com.earlyspring.webmvc.annotation.AsResponse;
+import com.earlyspring.webmvc.annotation.ResponseBody;
 import com.earlyspring.webmvc.render.JsonResultRender;
 import com.earlyspring.webmvc.render.Render;
 import lombok.Data;
@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.EventObject;
 import java.util.List;
 
 /**
@@ -82,7 +81,7 @@ public class HandlerExecutionChain {
      * @param result
      */
     private void setResultRender(HttpServletRequest req, HttpServletResponse resp, Object result) {
-        boolean useJson = executor.getHandlerInfo().getHandlerMethod().isAnnotationPresent(AsResponse.class);
+        boolean useJson = executor.getHandlerInfo().getHandlerMethod().isAnnotationPresent(ResponseBody.class);
         if ( useJson ){
             this.render = new JsonResultRender(result);
         }else{

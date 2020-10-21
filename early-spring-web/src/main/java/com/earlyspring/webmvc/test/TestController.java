@@ -1,8 +1,8 @@
 package com.earlyspring.webmvc.test;
 
 import com.earlyspring.ioc.bean.annotation.Controller;
-import com.earlyspring.webmvc.annotation.AsResponse;
-import com.earlyspring.webmvc.annotation.RequestEntrance;
+import com.earlyspring.webmvc.annotation.ResponseBody;
+import com.earlyspring.webmvc.annotation.RequestMapping;
 import com.earlyspring.webmvc.annotation.RequestParam;
 
 /**
@@ -10,11 +10,11 @@ import com.earlyspring.webmvc.annotation.RequestParam;
  * @Date 2020/10/4 10:21 下午
  */
 @Controller
-@RequestEntrance(pattern = "/demo")
+@RequestMapping(pattern = "/demo")
 public class TestController {
 
-    @RequestEntrance(pattern = "test")
-    @AsResponse
+    @RequestMapping(pattern = "test")
+    @ResponseBody
     public String hello(@RequestParam("param") String abcd){
         return "hello, " + abcd;
     }
